@@ -18,11 +18,11 @@ public class UserService {
 
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
-        User user = new User(request.getName(),  request.getEmail());
+        User user = new User(request.getUserName(),  request.getEmail());
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(
                 savedUser.getId(),
-                savedUser.getName(),
+                savedUser.getUserName(),
                 savedUser.getEmail(),
                 savedUser.getCreatedAt(),
                 savedUser.getModifiedAt());
@@ -34,7 +34,7 @@ public class UserService {
         for (User user : users) {
             GetUserResponse dto = new GetUserResponse(
                     user.getId(),
-                    user.getName(),
+                    user.getUserName(),
                     user.getEmail(),
                     user.getCreatedAt(),
                     user.getModifiedAt());
@@ -49,7 +49,7 @@ public class UserService {
         );
         return new GetUserResponse(
                 user.getId(),
-                user.getName(),
+                user.getUserName(),
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getModifiedAt());
@@ -59,10 +59,10 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
-        user.update(request.getName(), request.getEmail());
+        user.update(request.getUserName(), request.getEmail());
         return new UpdateUserResponse(
                 user.getId(),
-                user.getName(),
+                user.getUserName(),
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getModifiedAt()

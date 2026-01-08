@@ -30,7 +30,7 @@ public class ScheduleService {
         return new  CreateScheduleResponse(
                 savedSchedule.getId(),
                 savedSchedule.getUser().getId(),
-                savedSchedule.getUser().getName(),
+                savedSchedule.getUser().getUserName(),
                 savedSchedule.getTitle(),
                 savedSchedule.getContent(),
                 savedSchedule.getCreatedAt(),
@@ -45,7 +45,7 @@ public class ScheduleService {
             GetScheduleResponse response = new GetScheduleResponse(
                     schedule.getId(),
                     schedule.getUser().getId(),
-                    schedule.getUser().getName(),
+                    schedule.getUser().getUserName(),
                     schedule.getTitle(),
                     schedule.getContent(),
                     schedule.getCreatedAt(),
@@ -62,7 +62,7 @@ public class ScheduleService {
         return new  GetScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getUser().getName(),
+                schedule.getUser().getUserName(),
                 schedule.getTitle(),
                 schedule.getContent(),
                 schedule.getCreatedAt(),
@@ -78,7 +78,7 @@ public class ScheduleService {
         return new  UpdateScheduleResponse(
                 schedule.getId(),
                 schedule.getUser().getId(),
-                schedule.getUser().getName(),
+                schedule.getUser().getUserName(),
                 schedule.getTitle(),
                 schedule.getContent(),
                 schedule.getCreatedAt(),
