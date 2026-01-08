@@ -19,6 +19,12 @@ public class UserService {
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
         User user = new User(request.getUserName(), request.getEmail(), request.getPassword());
+        if (user.getPassword() == null) {
+            throw new IllegalStateException("패스워드를 입력해주세요.");
+        }
+        if (user.getPassword().length() < 8) {
+            throw new IllegalStateException("패스워드는 8자리 이상이어야 합니다.");
+        }
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(
                 savedUser.getId(),
@@ -59,6 +65,12 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
+        if (user.getPassword() == null) {
+            throw new IllegalStateException("패스워드를 입력해주세요.");
+        }
+        if (user.getPassword().length() < 8) {
+            throw new IllegalStateException("패스워드는 8자리 이상이어야 합니다.");
+        }
         user.update(request.getUserName(), request.getEmail(), request.getPassword());
         return new UpdateUserResponse(
                 user.getId(),
