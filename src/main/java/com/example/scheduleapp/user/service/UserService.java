@@ -18,7 +18,7 @@ public class UserService {
 
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
-        User user = new User(request.getUserName(),  request.getEmail());
+        User user = new User(request.getUserName(), request.getEmail(), request.getPassword());
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(
                 savedUser.getId(),
@@ -59,7 +59,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
-        user.update(request.getUserName(), request.getEmail());
+        user.update(request.getUserName(), request.getEmail(), request.getPassword());
         return new UpdateUserResponse(
                 user.getId(),
                 user.getUserName(),
