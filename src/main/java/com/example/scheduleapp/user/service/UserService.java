@@ -97,7 +97,7 @@ public class UserService {
         }
         return new SessionUser(
                 user.getId(),
-                user.getEmail(),
-                user.getPassword());
+                user.getUserName(),
+                user.getEmail());
     }
 }
