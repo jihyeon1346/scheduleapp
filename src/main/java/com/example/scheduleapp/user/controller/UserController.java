@@ -1,22 +1,44 @@
 package com.example.scheduleapp.user.controller;
 
 import com.example.scheduleapp.user.dto.*;
+import com.example.scheduleapp.user.repository.UserRepository;
 import com.example.scheduleapp.user.service.UserService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    @PostMapping("/users")
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
+    //회원가입
+    @PostMapping("/signup")
+    public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
+    }
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+        SessionUser sessionUser = userService.login(request);
+        session.setAttribute("loginUser", sessionUser);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @SessionAttribute(name = "loginUser", required =  false) SessionUser sessionUser, HttpSession session) {
+        if (sessionUser == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @GetMapping("/users")
     public ResponseEntity<List<GetUserResponse>> getAll(){
@@ -28,6 +50,7 @@ public class UserController {
     }
     @PutMapping("/users/{userId}")
     public ResponseEntity<UpdateUserResponse> updateUser(
+            @Valid
             @PathVariable Long userId,
             @RequestBody UpdateUserRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, request));

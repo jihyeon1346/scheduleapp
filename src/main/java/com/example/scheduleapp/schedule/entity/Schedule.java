@@ -20,13 +20,11 @@ public class Schedule extends BaseEntity{
     @JoinColumn(name = "user_id",  nullable = false)
     private User user;
 
-
     public  Schedule(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
     }
-
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
