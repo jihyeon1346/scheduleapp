@@ -16,6 +16,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
+    //회원가입
     @Transactional
     public SignupResponse save(SignupRequest request) {
         User user = new User(request.getUserName(), request.getEmail(), request.getPassword());
@@ -33,6 +34,7 @@ public class UserService {
                 savedUser.getCreatedAt(),
                 savedUser.getModifiedAt());
     }
+    //전체조회
     @Transactional(readOnly = true)
     public List<GetUserResponse> findAll() {
         List<User> users = userRepository.findAll();
@@ -48,6 +50,7 @@ public class UserService {
         }
         return dtos;
     }
+    //단건조회
     @Transactional(readOnly = true)
     public GetUserResponse findOne(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -60,6 +63,7 @@ public class UserService {
                 user.getCreatedAt(),
                 user.getModifiedAt());
     }
+    //유저업데이트
     @Transactional
     public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -80,6 +84,7 @@ public class UserService {
                 user.getModifiedAt()
         );
     }
+    //유저삭제
     @Transactional
     public void delete(Long userId) {
         boolean existence = userRepository.existsById(userId);
@@ -88,10 +93,13 @@ public class UserService {
         }
         userRepository.deleteById(userId);
     }
+    //로그인
     @Transactional(readOnly = true)
     public SessionUser login(@Valid LoginRequest request) {
+        //이메일로 유저찾기
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
                 () -> new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다."));
+        //패스워드비교
         if(!user.getPassword().equals(request.getPassword())) {
             throw new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }

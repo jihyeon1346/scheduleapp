@@ -19,6 +19,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
 
+    //일정생성
     @Transactional
     public CreateScheduleResponse save(CreateScheduleRequest request) {
         //userId로 User 조회
@@ -26,6 +27,10 @@ public class ScheduleService {
                 () -> new IllegalStateException(("없는 유저입니다"))
         );
         Schedule schedule = new Schedule(request.getTitle(), request.getContent(), user);
+        if(schedule.getTitle() == null)
+        {
+            throw new IllegalStateException("제목을 입력해주세요.");
+        }
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return new  CreateScheduleResponse(
                 savedSchedule.getId(),
@@ -37,6 +42,7 @@ public class ScheduleService {
                 savedSchedule.getModifiedAt()
         );
     }
+    //전체조회
     @Transactional(readOnly = true)
     public List<GetScheduleResponse> findAll() {
         List<Schedule> schedules = scheduleRepository.findAll();
@@ -54,6 +60,7 @@ public class ScheduleService {
         }
         return dtos;
     }
+    //단건조회
     @Transactional(readOnly = true)
     public GetScheduleResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
@@ -69,11 +76,16 @@ public class ScheduleService {
                 schedule.getModifiedAt()
         );
     }
+    //일정업데이트
     @Transactional
     public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );
+        if(schedule.getTitle() == null)
+        {
+            throw new IllegalStateException("제목을 입력해주세요.");
+        }
         schedule.update(request.getTitle(), request.getContent());
         return new  UpdateScheduleResponse(
                 schedule.getId(),
@@ -84,6 +96,7 @@ public class ScheduleService {
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt());
     }
+    //일정삭제
     @Transactional
     public void delete(Long scheduleId) {
         boolean existence = scheduleRepository.existsById(scheduleId);
