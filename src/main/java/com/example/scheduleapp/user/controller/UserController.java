@@ -23,8 +23,13 @@ public class UserController {
     }
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
-        SessionUser sessionUser = userService.login(request);
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+        LoginResponse result = userService.login(request);
+        SessionUser sessionUser = new SessionUser(
+                result.getId(),
+                result.getUserName(),
+                result.getEmail()
+        );
         session.setAttribute("loginUser", sessionUser);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

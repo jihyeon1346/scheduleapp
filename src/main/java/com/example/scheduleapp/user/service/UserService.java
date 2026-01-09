@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,15 +96,18 @@ public class UserService {
     }
     //로그인
     @Transactional(readOnly = true)
-    public SessionUser login(@Valid LoginRequest request) {
+    public LoginResponse login(@Valid LoginRequest request) {
         //이메일로 유저찾기
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
                 () -> new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다."));
-        //패스워드비교
-        if(!user.getPassword().equals(request.getPassword())) {
-            throw new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다.");
+        //패스워드비교 equal null 위험 수정
+//        if(!user.getPassword().equals(request.getPassword())) {
+//            throw new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다.");
+//        }
+        if (!ObjectUtils.nullSafeEquals(user.getPassword(), request.getPassword())) {
+            throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
-        return new SessionUser(
+        return new LoginResponse(
                 user.getId(),
                 user.getUserName(),
                 user.getEmail());

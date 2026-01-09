@@ -3,6 +3,7 @@ package com.example.scheduleapp.schedule.service;
 import com.example.scheduleapp.schedule.dto.*;
 import com.example.scheduleapp.schedule.entity.Schedule;
 import com.example.scheduleapp.schedule.repository.ScheduleRepository;
+import com.example.scheduleapp.user.dto.SessionUser;
 import com.example.scheduleapp.user.entity.User;
 import com.example.scheduleapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ public class ScheduleService {
 
     //일정생성
     @Transactional
-    public CreateScheduleResponse save(CreateScheduleRequest request) {
+    public CreateScheduleResponse save(SessionUser sessionUser, CreateScheduleRequest request) {
         //userId로 User 조회
-        User user = userRepository.findById(request.getUserId()).orElseThrow(
+        User user = userRepository.findById(sessionUser.getId()).orElseThrow(
                 () -> new IllegalStateException(("없는 유저입니다"))
         );
         Schedule schedule = new Schedule(request.getTitle(), request.getContent(), user);
@@ -44,7 +45,10 @@ public class ScheduleService {
     }
     //전체조회
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> findAll() {
+    public List<GetScheduleResponse> findAll(SessionUser sessionUser) {
+        if (sessionUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
         List<Schedule> schedules = scheduleRepository.findAll();
         List<GetScheduleResponse> dtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
@@ -62,7 +66,10 @@ public class ScheduleService {
     }
     //단건조회
     @Transactional(readOnly = true)
-    public GetScheduleResponse findOne(Long scheduleId) {
+    public GetScheduleResponse findOne(SessionUser sessionUser, Long scheduleId) {
+        if (sessionUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );
@@ -78,7 +85,10 @@ public class ScheduleService {
     }
     //일정업데이트
     @Transactional
-    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
+    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request,SessionUser sessionUser) {
+        if (sessionUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );
@@ -98,7 +108,10 @@ public class ScheduleService {
     }
     //일정삭제
     @Transactional
-    public void delete(Long scheduleId) {
+    public void delete(Long scheduleId, SessionUser sessionUser) {
+        if (sessionUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
         boolean existence = scheduleRepository.existsById(scheduleId);
         if(!existence) {
             throw new IllegalStateException("없는 일정입니다.");
