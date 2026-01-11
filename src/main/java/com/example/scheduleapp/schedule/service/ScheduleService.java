@@ -86,9 +86,7 @@ public class ScheduleService {
     //일정업데이트
     @Transactional
     public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request,SessionUser sessionUser) {
-        if (sessionUser == null) {
-            throw new IllegalArgumentException("로그인이 필요합니다.");
-        }
+
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("없는 일정입니다.")
         );

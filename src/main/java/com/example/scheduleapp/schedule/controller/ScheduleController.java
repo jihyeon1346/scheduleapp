@@ -21,11 +21,15 @@ public class ScheduleController {
     public ResponseEntity<CreateScheduleResponse> createSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @RequestBody CreateScheduleRequest request){
+        if (sessionUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser, request));
     }
     //전체조회
     @GetMapping("/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getAll(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
+    public ResponseEntity<List<GetScheduleResponse>> getAll(
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -36,6 +40,9 @@ public class ScheduleController {
     public ResponseEntity<GetScheduleResponse> getOne(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId){
+        if (sessionUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findOne(sessionUser, scheduleId));
     }
     //일정업데이트
@@ -44,6 +51,9 @@ public class ScheduleController {
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @Valid @PathVariable Long scheduleId,
             @RequestBody UpdateScheduleRequest request){
+        if (sessionUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(scheduleId, request, sessionUser));
     }
     //일정삭제
@@ -51,6 +61,9 @@ public class ScheduleController {
     public ResponseEntity<Void> deleteSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
             @PathVariable Long scheduleId){
+        if (sessionUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         scheduleService.delete(scheduleId, sessionUser);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
