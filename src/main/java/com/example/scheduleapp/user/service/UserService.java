@@ -16,11 +16,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     //회원가입
     @Transactional
     public SignupResponse save(SignupRequest request) {
-        User user = new User(request.getUserName(), request.getEmail(), request.getPassword());
+        //패스워드 암호화하기
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        //암호화한 패스워드 넣기 수정
+        User user = new User(request.getUserName(), request.getEmail(), encodedPassword);
         if (user.getPassword() == null) {
             throw new IllegalStateException("패스워드를 입력해주세요.");
         }
@@ -70,12 +74,16 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다.")
         );
-        if (user.getPassword() == null) {
+        if (request.getPassword() == null) {
             throw new IllegalStateException("패스워드를 입력해주세요.");
         }
-        if (user.getPassword().length() < 8) {
+        if (request.getPassword().length() < 8) {
             throw new IllegalStateException("패스워드는 8자리 이상이어야 합니다.");
         }
+        //암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        //암호화한 패스워드로 업데이트
+        user.update(request.getUserName(), request.getEmail(), encodedPassword);
         user.update(request.getUserName(), request.getEmail(), request.getPassword());
         return new UpdateUserResponse(
                 user.getId(),
@@ -99,13 +107,16 @@ public class UserService {
     public LoginResponse login(@Valid LoginRequest request) {
         //이메일로 유저찾기
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                () -> new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다."));
+                () -> new IllegalStateException("존재하지 않는 이메일입니다."));
         //패스워드비교 equal null 위험 수정
 //        if(!user.getPassword().equals(request.getPassword())) {
 //            throw new IllegalStateException("이메일 또는 비밀번호가 일치하지 않습니다.");
 //        }
-        if (!ObjectUtils.nullSafeEquals(user.getPassword(), request.getPassword())) {
-            throw new IllegalStateException("패스워드가 일치하지 않습니다.");
+//        if (!ObjectUtils.nullSafeEquals(user.getPassword(), request.getPassword())) {
+//            throw new IllegalStateException("패스워드가 일치하지 않습니다.");
+//        }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
         return new LoginResponse(
                 user.getId(),
