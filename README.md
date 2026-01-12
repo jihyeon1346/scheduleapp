@@ -259,7 +259,7 @@ POST /schedules/{scheduleId}/comments
   "id": 1,
   "scheduleId": 1,
   "userId": 1,
-  "content": "좋은 일정이네요!",
+  "content": "댓글내용",
   "createdAt": "2026-01-11T11:11:11",
   "modifiedAt": "2026-01-11T11:11:11"
 }
